@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Store</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Icons & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Vue.js -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-left">📚 <span>Book Store</span></div>
+      <ul class="nav-links">
+        <template v-if="!isLoggedIn">
+          <li><a href="#" @click.prevent="toggleForm(true)">Login</a></li>
+          <li><a href="#" @click.prevent="toggleForm(false)">Register</a></li>
+        </template>
+        <template v-else>
+          <li><a href="#" @click.prevent="toggleCartView(false)">Browse</a></li>
+          <li>
+            <a href="#" :style="{opacity: cart.length ? 1 : 0.5, pointerEvents: cart.length ? 'auto' : 'none'}"
+              @click.prevent="toggleCartView(!showCart)">
+              🛒 Cart ({{ cart.length }})
+            </a>
+          </li>
+          <li><a href="#" @click.prevent="logout">Logout</a></li>
+        </template>
+      </ul>
+    </nav>
+
+    <!-- Auth -->
+    <div v-if="!isLoggedIn" class="auth-wrapper">
+      <div class="form-header">
+        <button :class="{active: showLogin}" @click="toggleForm(true)">Login</button>
+        <button :class="{active: !showLogin}" @click="toggleForm(false)">Register</button>
+      </div>
+
+      <div class="form-container">
+        <!-- Login -->
+        <div v-if="showLogin">
+          <h1>Login</h1>
+          <div class="input-box"><i class="fa fa-envelope"></i>
+            <input type="text" placeholder="Username or Email" v-model="loginEmail">
+          </div>
+          <div class="input-box"><i class="fa fa-lock"></i>
+            <input type="password" placeholder="Password" v-model="loginPassword">
+          </div>
+          <button class="btn" @click="validateLogin">Login</button>
+          <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+        </div>
+
+        <!-- Register -->
+        <div v-else>
+          <h1>Register</h1>
+          <div class="input-box"><i class="fa fa-user"></i>
+            <input type="text" placeholder="Username" v-model="registerUsername">
+          </div>
+          <div class="input-box"><i class="fa fa-envelope"></i>
+            <input type="email" placeholder="Email" v-model="registerEmail">
+          </div>
+          <div class="input-box"><i class="fa fa-lock"></i>
+            <input type="password" placeholder="Password" v-model="registerPassword">
+          </div>
+          <div class="input-box"><i class="fa fa-lock"></i>
+            <input type="password" placeholder="Confirm Password" v-model="confirmPassword">
+          </div>
+          <button class="btn" @click="registerUser">Register</button>
+          <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div v-else class="dashboard">
+      <h2 v-if="!showCart">Welcome, {{ currentUser.username }}!</h2>
+
+      <!-- Browse Lessons -->
+      <div v-if="!showCart">
+        <div class="filters">
+          <label>Sort by:
+            <select v-model="sortAttribute">
+              <option value="subject">Subject</option>
+              <option value="location">Location</option>
+              <option value="price">Price</option>
+              <option value="space">Availability</option>
+            </select>
+          </label>
+          <select v-model="sortOrder">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </div>
+
+        <div class="lessons-container">
+          <div class="lesson-card" v-for="lesson in sortedLessons" :key="lesson.subject">
+            <h3>{{ lesson.subject }}</h3>
+            <p><strong>Location:</strong> {{ lesson.location }}</p>
+            <p><strong>Price:</strong> ${{ lesson.price }}</p>
+            <p><strong>Available Space:</strong> {{ lesson.space }}</p>
+            <p><strong>Tutor:</strong> {{ lesson.tutor }}</p>
+            <p><strong>Rating:</strong> ⭐ {{ lesson.rating }}</p>
+            <p><strong>Book:</strong> {{ lesson.book }}</p>
+            <button class="btn" @click="addToCart(lesson)" :disabled="lesson.space === 0">
+              {{ lesson.space > 0 ? "Add to Cart" : "Sold Out" }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shopping Cart -->
+      <div v-else class="cart-container">
+        <h2>Your Shopping Cart</h2>
+        <div v-if="cart.length">
+          <div class="cart-item" v-for="(item, index) in cart" :key="index">
+            <span>{{ item.subject }} ({{ item.location }})</span>
+            <button @click="removeFromCart(index)">Remove</button>
+          </div>
+
+          <div class="checkout-form">
+            <h3>Checkout</h3>
+            <input type="text" placeholder="Name" v-model="checkoutName" />
+            <input type="text" placeholder="Phone" v-model="checkoutPhone" />
+            <button class="btn" :disabled="!isCheckoutValid" @click="checkout">Checkout</button>
+          </div>
+        </div>
+        <p v-else>Your cart is empty.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="app.js"></script>
+</body>
+</html>
