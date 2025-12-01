@@ -80,7 +80,7 @@ createApp({
       if (this.registerPassword !== this.confirmPassword)
         return this.errorMessage = "Passwords do not match!";
 
-      fetch("http://localhost:5000/users/register", {
+      fetch("https://bookstorev2-1.onrender.com/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -107,7 +107,7 @@ createApp({
     // LOGIN USER
     // -------------------------
     validateLogin() {
-      fetch("http://localhost:5000/users/login", {
+     fetch("https://bookstorev2-1.onrender.com/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -158,7 +158,7 @@ createApp({
       const lessonIDs = this.cart.map(item => item._id);
       const spaces = this.cart.map(() => 1);
 
-      fetch("http://localhost:5000/orders", {
+     fetch("https://bookstorev2-1.onrender.com/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -171,7 +171,7 @@ createApp({
         .then(() => {
           // Update spaces in DB
           this.cart.forEach(item => {
-            fetch(`http://localhost:5000/lessons/${item._id}`, {
+            fetch(`https://bookstorev2-1.onrender.com/lessons/${item._id}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ space: item.space })
@@ -195,7 +195,7 @@ createApp({
   // LOAD LESSONS
   // -------------------------
   mounted() {
-    fetch("http://localhost:5000/lessons")
+    fetch("https://bookstorev2-1.onrender.com/lessons")
       .then(res => res.json())
       .then(data => {
         console.log("Lessons fetched:", data);
